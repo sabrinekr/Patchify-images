@@ -1,11 +1,11 @@
-"""Python file containing the utilities for the patching scrpit."""
+"""Python file containing the utilities for the patching script."""
 
 import numpy as np
 
 
 def calculate_quadrilateral_area(vertices):
     """
-    Calculate the area of a quadrilateral defined by its vertices using 
+    Calculate the area of a quadrilateral defined by its vertices using
         the shoelace formula.
 
     Args:
@@ -37,7 +37,7 @@ def get_patches_brightness(patches: np.ndarray) -> np.ndarray:
 
     Args:
         patches: array of the patches of shape
-            (image_width/ patch_shape, image_heigh/ patch_shape, 
+            (image_width/ patch_shape, image_heigh/ patch_shape,
                 patch_shape, patch_shape).
 
     Returns:
