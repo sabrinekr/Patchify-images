@@ -1,51 +1,72 @@
 """Test image patching utils."""
 import numpy as np
-from patchify import patchify
 import pytest
+from patchify import patchify
+
 from patching_utils import *
 
 
 @pytest.mark.parametrize(
     ("patches", "expected_brightness"),
-    [(np.array([
     [
-        [
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-        ]
-    ]
-]), [[3.0]]),
-    (np.array([[[[1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5]],
-
-        [[1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5],
-         [1, 2, 3, 4, 5]]],
-
-
-       [[[1, 1, 1, 1, 1],
-         [1, 1, 1, 1, 1],
-         [1, 1, 1, 1, 1],
-         [1, 1, 1, 1, 1],
-         [1, 1, 1, 1, 1]],
-
-        [[0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0]]]]), [[3.0, 3.0], [1.0, 0.0]])]
+        (
+            np.array(
+                [
+                    [
+                        [
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                        ]
+                    ]
+                ]
+            ),
+            [[3.0]],
+        ),
+        (
+            np.array(
+                [
+                    [
+                        [
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                        ],
+                        [
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                            [1, 2, 3, 4, 5],
+                        ],
+                    ],
+                    [
+                        [
+                            [1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1],
+                        ],
+                        [
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0],
+                        ],
+                    ],
+                ]
+            ),
+            [[3.0, 3.0], [1.0, 0.0]],
+        ),
+    ],
 )
-def test_get_patches_brightness(
-    patches: np.ndarray, expected_brightness
-) -> None:
+def test_get_patches_brightness(patches: np.ndarray, expected_brightness) -> None:
     """Check get the patches brightness.
 
     Args:
@@ -58,9 +79,11 @@ def test_get_patches_brightness(
     assert brightness.shape == patches.shape[:2]
     assert (brightness == expected_brightness).all()
 
+
 @pytest.mark.parametrize(
     ("brightness", "num_top_patches", "expected_top_bright_indices"),
-    [(np.array([[3.0, 3.0], [1.0, 0.0]]), 2, (np.array([0, 0]), np.array([0, 1])))])
+    [(np.array([[3.0, 3.0], [1.0, 0.0]]), 2, (np.array([0, 0]), np.array([0, 1])))],
+)
 def test_get_top_bright_indices(
     brightness: np.ndarray, num_top_patches, expected_top_bright_indices
 ) -> None:
@@ -76,34 +99,49 @@ def test_get_top_bright_indices(
     assert (top_bright_indices[0] == expected_top_bright_indices[0]).all()
     assert (top_bright_indices[1] == expected_top_bright_indices[1]).all()
 
+
 @pytest.mark.parametrize(
     ("image", "patch_size", "num_top_patches", "expected_top_bright_centers"),
     [
-    (np.array([
-    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
-    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
-    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
-    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
-    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
-    [9, 10, 20, 12, 13, 4, 5, 16, 7, 8],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
-]), 5, 2, (20, 16)),
-    (np.array([
-    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
-    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
-    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
-    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
-    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
-    [9, 10, 20, 12, 13, 4, 5, 16, 7, 8, 1, 12, 13],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
-    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
-]), 5, 2, (200, 20))
-]
+        (
+            np.array(
+                [
+                    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+                    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+                    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+                    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+                    [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
+                    [9, 10, 20, 12, 13, 4, 5, 16, 7, 8],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8],
+                ]
+            ),
+            5,
+            2,
+            (20, 16),
+        ),
+        (
+            np.array(
+                [
+                    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
+                    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
+                    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
+                    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
+                    [1, 2, 3, 4, 5, 200, 200, 200, 200, 200, 1, 8, 7],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
+                    [9, 10, 20, 12, 13, 4, 5, 16, 7, 8, 1, 12, 13],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
+                    [9, 10, 11, 12, 13, 4, 5, 6, 7, 8, 1, 12, 13],
+                ]
+            ),
+            5,
+            2,
+            (200, 20),
+        ),
+    ],
 )
 def test_get_image_brightest_centers(
     image: np.ndarray, patch_size, num_top_patches, expected_top_bright_centers
@@ -116,9 +154,15 @@ def test_get_image_brightest_centers(
         num_top_patches: the top bright patches to get in the output.
         expected_top_bright_centers: the expected top bright centers to get in the output.
     """
-    patches = patchify(image, (patch_size,patch_size), step= patch_size) 
+    patches = patchify(image, (patch_size, patch_size), step=patch_size)
     brightness = get_patches_brightness(patches=patches)
     top_brightness_indices = get_top_bright_indices(brightness, num_top_patches)
     top_bright_centers = get_top_bright_centers(top_brightness_indices, patch_size)
-    assert image[top_bright_centers[0][0], top_bright_centers[0][1]] == expected_top_bright_centers[0]
-    assert image[top_bright_centers[1][0], top_bright_centers[1][1]] == expected_top_bright_centers[1]
+    assert (
+        image[top_bright_centers[0][0], top_bright_centers[0][1]]
+        == expected_top_bright_centers[0]
+    )
+    assert (
+        image[top_bright_centers[1][0], top_bright_centers[1][1]]
+        == expected_top_bright_centers[1]
+    )
